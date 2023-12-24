@@ -69,3 +69,29 @@ class CreateProductView(APIView):
 
 
 
+'''To Increase(ie create) the count every time when the product link is clicked .
+Why this?for first time there will not be any infuncer if or organiser link .
+Its admin or simply the product link '''
+class CreateProductClicks(APIView):
+    def patch(self, request, product_unique_id):
+        try:
+            product = Product.objects.get(unique_id = product_unique_id)
+            product.clicks = +1
+            product.save()
+            return Response({'message' : 'Product clicked'}, status=status.HTTP_201_CREATED)
+        except Product.DoesNotExist:
+            return Response({'message' : "Something whent wrong...Please try again later"})
+
+
+#To get all the product details min admin dash
+class GetAllProductDeatilsInAdminDash(APIView):
+    def get(self, request):
+        try:
+            products= Product.objects.all()
+            serializer = ProductSeriaizer(products, many = True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Product.DoesNotExist:
+            return Response({'message' : "Something whent wrong...Please try again later"})
+
+
+#Done api in excel ^^

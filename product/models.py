@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 
-from userapp.models import UserData
+from userapp.models import UserData, UserDetails
 
 LINK_HOLEDR_ROLE_CHOICE = {
     ('influencer' ,'influencer'),
@@ -16,6 +16,7 @@ class Product(models.Model):
     created_by = models.ForeignKey(UserData, on_delete = models.CASCADE,default = '1')
     unique_id = models.CharField(max_length = 15,null = True, blank= True, unique= True)
     product_link = models.URLField(blank=True, null=True)  # Use URLField for storing links
+    clicks = models.IntegerField(default=0)
 
 
 class RegionData(models.Model):
@@ -30,11 +31,12 @@ class RefferalLink(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     link_holder_role = models.CharField(max_length=50, choices=LINK_HOLEDR_ROLE_CHOICE, default='admin')
     created_at = models.DateTimeField(auto_now_add=True)
-    # generated_by = models.ForeignKey(UserData, on_delete = models.CASCADE)
-
+    clicks = models.IntegerField(default=0)
 
 class Payment(models.Model):
-    user = models.ForeignKey(UserData, on_delete= models.CASCADE)
+    # user = models.ForeignKey(UserData, on_delete= models.CASCADE)
+    user_details = models.ForeignKey(UserDetails, on_delete = models.CASCADE, default = '1')
+    refferal_link = models.ForeignKey(RefferalLink, on_delete = models.CASCADE,default = '1')
 
 
 

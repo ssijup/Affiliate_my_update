@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.db import transaction
 
 from userapp.serializer import UserDataSerializer,UserDetailsSerializer
-from product.serializer import ProductSeriaizer,RefferalLinkSerializer, UserRequestingforUpgradingToOrganiserSerializer
+from product.serializer import ProductSeriaizer,RefferalLinkSerializer, UserRequestingforUpgradingToOrganiserSerializer 
 from .models import UserData,UserDetails, UserRequestingforUpgradingToOrganiser
 from product.models import Product, RefferalLink
 from affiliate.settings import SITE_DOMAIN_NAME
@@ -102,7 +102,36 @@ class GetUSerUpgradationRequests(APIView):
         users = UserRequestingforUpgradingToOrganiser.objects.all()
         serializer = UserRequestingforUpgradingToOrganiserSerializer(users, many = True)
         return Response(serializer.data , status=status.HTTP_200_OK)
-    
+
+
+
+#To approve or reject user request to upgradation
 class UserResquestApproValForUpgradation(APIView):
     def patch(self,request,upgrading_user_id):
         pass
+
+
+#
+class CreateProductClicksForUser(APIView):
+    def patch(self, request, product_unique_id,link_uuid):
+        try:
+            link = RefferalLink.objects.get(uuid = link_uuid, product__unique_id = product_unique_id)
+            link.clicks = +1
+            link.save()
+            return Response({'message' : 'link of user clicked'}, status=status.HTTP_201_CREATED)
+        except RefferalLink.DoesNotExist:
+            return Response({'message' : "Something whent wrong...Please try again later"})
+
+
+#To displaying the details of a user when clicked     
+class DetailsOfUserUsingId(APIView):
+    def get(self, request, user_id):
+        try:
+            user = UserData.objects.get(id = user_id) 
+            user_details = RefferalLink.objects.filter(user = user)
+            serializer = RefferalLinkSerializer(user_details, many = True)
+            return Response(status= status.HTTP_200_OK)
+        except UserData.DoesNotExist:
+            return Response({'message' : "Something whent wrong...Please try again later"})
+        
+#Done api in excel ^^
